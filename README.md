@@ -1,59 +1,284 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🧵 YoPrint Laravel CSV Upload Project
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+[![Laravel](https://img.shields.io/badge/Laravel-11.x-red.svg)](https://laravel.com)
+[![PHP](https://img.shields.io/badge/PHP-%5E8.4-blue.svg)](https://php.net)
+[![Tests](https://img.shields.io/badge/Tests-Pest-green.svg)](https://pestphp.com)
+[![License](https://img.shields.io/badge/license-MIT-lightgrey.svg)](LICENSE)
 
-## About Laravel
+A minimal but production-grade Laravel project demonstrating **CSV file uploads**, **background job processing**, **UPSERT logic**, and **clean architecture (Controller → Service → Repository → Job)**.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 🚀 Features
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- ✅ CSV Upload with Validation (`FormRequest`)
+- ⚙️ Background Processing using Queues (Redis / Horizon)
+- 🔁 Idempotent Uploads + UPSERT by `UNIQUE_KEY`
+- 🧩 Clean Architecture (Repository + Service + Form Request)
+- 🧱 MySQL for app runtime, SQLite for tests
+- 🧪 Fully tested with PestPHP
+- 🖥️ Real-time status updates via Alpine.js polling
+- 🎨 Laravel Breeze for Auth + UI scaffold
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## 🧰 Tech Stack
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+| Layer | Technology |
+|-------|-------------|
+| Framework | Laravel 11 .x |
+| Language | PHP 8.2 + |
+| Database | MySQL (App) / SQLite (Testing) |
+| Queue | Redis + Horizon |
+| Auth | Laravel Breeze |
+| Frontend | Blade + Alpine.js |
+| Testing | PestPHP |
 
-## Laravel Sponsors
+---
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## 🏗️ Project Setup
 
-### Premium Partners
+### 1️⃣ Clone Repository
+```bash
+git clone https://github.com/yourusername/yoprint-laravel.git
+cd yoprint-laravel
+````
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+---
 
-## Contributing
+### 2️⃣ Install Dependencies
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```bash
+composer install
+npm install && npm run build
+```
 
-## Code of Conduct
+---
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 3️⃣ Environment Setup
 
-## Security Vulnerabilities
+Copy and configure environment files:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```bash
+cp .env.example .env
+cp .env.example .env.testing
+```
 
-## License
+Generate keys:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```bash
+php artisan key:generate
+php artisan key:generate --env=testing
+```
+
+---
+
+### 4️⃣ Configure Databases
+
+#### 🔹 Main App (MySQL)
+
+Edit `.env`:
+
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=yoprint
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+#### 🔹 Tests (SQLite)
+
+Edit `.env.testing`:
+
+```env
+DB_CONNECTION=sqlite
+DB_DATABASE=:memory:
+FILESYSTEM_DISK=public
+```
+
+Run migrations:
+
+```bash
+php artisan migrate
+```
+
+---
+
+### 5️⃣ Install Laravel Breeze
+
+```bash
+php artisan breeze:install
+npm run build
+php artisan migrate
+```
+
+---
+
+### 6️⃣ Queue Setup (Redis + Horizon)
+
+Start Redis (e.g. via Homebrew or Docker):
+
+```bash
+brew services start redis
+```
+
+Run Horizon dashboard:
+
+```bash
+php artisan horizon
+```
+
+---
+
+### 7️⃣ Serve Application
+
+```bash
+php artisan serve
+```
+
+Your app will be available at
+👉 **[http://localhost:8000](http://localhost:8000)**
+
+---
+
+## ⚙️ Functional Overview
+
+### 🧭 UploadController
+
+* `index()` → Display upload UI
+* `store()` → Validate file, save to storage, dispatch background job
+* `list()` → Return latest uploads as JSON (via `UploadResource`)
+
+### 🧾 StoreUploadRequest
+
+Ensures file is valid:
+
+```php
+'file' => ['required', 'file', 'mimes:csv,txt', 'max:204800']
+```
+
+### 🧠 UploadService
+
+Handles all business logic:
+
+* Compute file checksum
+* Save to storage (`storage/app/uploads/`)
+* Call repository
+* Dispatch `ProcessUploadCsv` job
+
+### 🗄️ UploadRepository
+
+Database layer:
+
+* `findOrCreate()` → find existing upload or create new
+* `latest()` → fetch recent uploads
+
+### ⚡ ProcessUploadCsv Job
+
+Runs asynchronously:
+
+* Cleans non-UTF-8 characters
+* Parses CSV
+* UPSERTs products by `UNIQUE_KEY`
+
+### 📦 RepositoryServiceProvider
+
+Dependency injection binding:
+
+```php
+$this->app->bind(UploadRepositoryInterface::class, UploadRepository::class);
+```
+
+---
+
+## 🧩 Project Structure
+
+```
+app/
+ ├── Http/
+ │   ├── Controllers/UploadController.php
+ │   ├── Requests/StoreUploadRequest.php
+ │   └── Resources/UploadResource.php
+ ├── Interfaces/UploadRepositoryInterface.php
+ ├── Repositories/UploadRepository.php
+ ├── Services/UploadService.php
+ ├── Jobs/ProcessUploadCsv.php
+ ├── Providers/RepositoryServiceProvider.php
+ └── Models/Upload.php
+```
+
+---
+
+## 🧪 Testing (PestPHP)
+
+All tests use **SQLite** in memory.
+
+Run:
+
+```bash
+php artisan test
+# or
+./vendor/bin/pest
+```
+
+Example test:
+
+```php
+it('uploads csv successfully', function () {
+    Bus::fake();
+    $file = UploadedFile::fake()->create('test.csv', 5, 'text/csv');
+    post(route('upload.store'), ['file' => $file])->assertRedirect('/');
+    Bus::assertDispatched(ProcessUploadCsv::class);
+});
+```
+
+---
+
+## 🧱 Example Workflow
+
+1. User uploads CSV
+2. File saved → record created in `uploads` table
+3. Job `ProcessUploadCsv` runs in background
+4. Data parsed & upserted
+5. UI auto-refreshes to show updated status
+
+---
+
+## 📂 CSV Format
+
+| UNIQUE_KEY  | PRODUCT_TITLE | PRODUCT_DESCRIPTION | STYLE# | SANMAR_MAINFRAME_COLOR | SIZE | COLOR_NAME  | PIECE_PRICE |
+| ----------- | ------------- | ------------------- | ------ | ---------------------- | ---- | ----------- | ----------- |
+| G5000-RED-M | T-Shirt       | 100% Cotton         | G5000  | Red                    | M    | Classic Red | 5.50        |
+
+---
+
+## 🖥️ UI Overview
+
+* Drag-and-Drop upload area
+* Upload button
+* Real-time table refresh
+
+Example:
+
+```
+---------------------------------------------------------
+| Time             | File Name         | Status          |
+|-------------------------------------------------------|
+| 2 mins ago       | import.csv        | Completed       |
+| 5 mins ago       | prices_update.csv | Processing...   |
+---------------------------------------------------------
+```
+
+---
+
+## 🧑‍💻 Local Development Commands
+
+| Action           | Command                            |
+| ---------------- | ---------------------------------- |
+| Run local server | `php artisan serve`                |
+| Run queue worker | `php artisan queue:work`           |
+| Run Horizon      | `php artisan horizon`              |
+| Run tests        | `php artisan test`                 |
+| Refresh DB       | `php artisan migrate:fresh --seed` |
