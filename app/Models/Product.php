@@ -10,13 +10,13 @@ class Product extends Model
     use HasFactory;
 
     protected $fillable = [
-        'unique_key', 
-        'product_title', 
-        'product_description', 
+        'unique_key',
+        'product_title',
+        'product_description',
         'style_number',
-        'sanmar_mainframe_color', 
-        'size', 
-        'color_name', 
+        'sanmar_mainframe_color',
+        'size',
+        'color_name',
         'piece_price',
     ];
 }
